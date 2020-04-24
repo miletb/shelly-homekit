@@ -318,8 +318,13 @@ HAPService *shelly_sw_service_create(
   const HAPCharacteristic **chars = calloc(3, sizeof(*chars));
   if (chars == NULL) return NULL;
   svc->iid = IID_BASE + (IID_STEP * cfg->id) + 0;
+#ifdef PRODUCT_TYPE_LIGHT
+  svc->serviceType = &kHAPServiceType_LightBulb;
+  svc->debugDescription = kHAPServiceDebugDescription_LightBulb;
+#else
   svc->serviceType = &kHAPServiceType_Switch;
   svc->debugDescription = kHAPServiceDebugDescription_Switch;
+#endif
   svc->name = cfg->name;
   svc->properties.primaryService = true;
   chars[0] = shelly_sw_name_char(IID_BASE + (IID_STEP * cfg->id) + 1);

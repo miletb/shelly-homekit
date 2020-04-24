@@ -91,7 +91,11 @@ HAPError shelly_identify_cb(HAPAccessoryServerRef *server,
 
 static HAPAccessory s_accessory = {
     .aid = 1,
+#ifdef PRODUCT_TYPE_LIGHT
+    .category = kHAPAccessoryCategory_Lighting,
+#else
     .category = kHAPAccessoryCategory_Switches,
+#endif
     .name = NULL,  // Set from config,
     .manufacturer = CS_STRINGIFY_MACRO(PRODUCT_VENDOR),
     .model = CS_STRINGIFY_MACRO(PRODUCT_MODEL),
@@ -464,6 +468,25 @@ enum mgos_app_init_result mgos_app_init(void) {
   int i = 3;
   // Workaround for Shelly2.5: initing SW1 input (GPIO13) somehow causes
   // SW2 output (GPIO15) to turn on. Initializing SW2 first fixes it.
+
+#ifdef MGOS_CONFIG_HAVE_SW4
+  services[i] = shelly_sw_service_create(
+#ifdef MGOS_HAVE_ADE7953
+      s_ade7953, 0,
+#endif
+      mgos_sys_config_get_sw4());
+  if (services[i] != NULL) i++;
+#endif
+
+#ifdef MGOS_CONFIG_HAVE_SW3
+  services[i] = shelly_sw_service_create(
+#ifdef MGOS_HAVE_ADE7953
+      s_ade7953, 0,
+#endif
+      mgos_sys_config_get_sw3());
+  if (services[i] != NULL) i++;
+#endif
+
 #ifdef MGOS_CONFIG_HAVE_SW2
   services[i] = shelly_sw_service_create(
 #ifdef MGOS_HAVE_ADE7953

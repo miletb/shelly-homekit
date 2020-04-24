@@ -26,7 +26,7 @@ config_schema:
   - ["sw.in_gpio", "i", -1, {"Input sensing pin"}]
   - ["sw.in_mode", "i", 1, {"0 - Momentary, 1 - Toggle, 2 - Edge, 3 - Detached"}]
   - ["sw.state", "b", false, {"State of the switch"}]
-  - ["sw.initial_state", "i", 3, {"Initial state on power-on: 0 - off, 1 - on, 2 - restore last state, 3 - matches input if in toggle mode, otherwise off"}]
+  - ["sw.initial_state", "i", 0, {"Initial state on power-on: 0 - off, 1 - on, 2 - restore last state, 3 - matches input if in toggle mode, otherwise off"}]
   - ["sw.auto_off", "b", false, {"Whether the switch should automatically turn OFF after turning ON"}]
   - ["sw.auto_off_delay", "d", -1, {"Delay for automatically turning OFF, in seconds"}]
 
@@ -40,7 +40,7 @@ build_vars:
   MGOS_HAP_SIMPLE_CONFIG: 1
 
 cdefs:
-  PRODUCT_VENDOR: '"Allterco"'
+  PRODUCT_VENDOR: '"Elekjel"'
   SERVICE_NAME: '"Switch"'
   LED_GPIO: -1
   BTN_GPIO: -1
@@ -226,6 +226,74 @@ conds:
         - ["sw2.name", "Shelly SW2"]
         - ["sw2.out_gpio", 15]
         - ["sw2.in_gpio",  5]
+
+  - when: build_vars.MODEL == "MILE4"
+    apply:
+      name: mile4
+      libs:
+        - origin: https://github.com/mongoose-os-libs/mbedtls
+          variant: esp8266-noatca
+        - origin: https://github.com/mongoose-os-libs/mongoose
+          variant: esp8266-nossl
+      build_vars:
+        FLASH_SIZE: 2097152
+        FS_SIZE: 262144
+        BOOT_CONFIG_ADDR: 0x1000
+        MGOS_ROOT_FS_TYPE: SPIFFS
+        MGOS_MBEDTLS_ENABLE_ATCA: 0
+      cdefs:
+        LED_GPIO: 2
+        LED_ON: 0
+        BTN_GPIO: 0
+        BTN_DOWN: 0
+        PRODUCT_MODEL: '"MILE4"'
+        PRODUCT_HW_REV: '"1.0"'
+        PRODUCT_TYPE_LIGHT: 1
+        NUM_SWITCHES: 4
+        MG_ENABLE_SSL: 0
+        # HAP_LOG_LEVEL: 0
+      config_schema:
+        - ["device.id", "mile-light-1"]
+        # WIFI config
+        - ["wifi.sta.enable", true]
+        - ["wifi.sta.ssid", "Net-Net Bre"]
+        - ["wifi.sta.pass", "valentinakitic"]
+        - ["wifi.sta_ps_mode", 0]
+        #- ["wifi.sta.listen_interval_ms", 300]
+        - ["wifi.ap.enable", false]
+        # DEBUG log
+        - ["debug.stderr_uart", 1]
+        - ["debug.stdout_uart", 1]
+        - ["debug.udp_log_addr", "192.168.1.60:2203"]
+        # I2C
+        - ["i2c.enable", false]
+        #- ["i2c.sda_gpio", 12]
+        #- ["i2c.scl_gpio", 14]
+        # SWITCH SETUP
+        - ["sw1", "sw", {"title": "LIGHT1 settings"}]
+        - ["sw1.id", 0]
+        - ["sw1.name", "MILE LIGHT 1"]
+        - ["sw1.out_gpio", 14]
+        - ["sw1.out_on_value", 0]
+        #- ["sw1.in_gpio",  3]
+        - ["sw2", "sw", {"title": "LIGHT2 settings"}]
+        - ["sw2.id", 1]
+        - ["sw2.name", "MILE LIGHT 2"]
+        - ["sw2.out_gpio", 12]
+        - ["sw2.out_on_value", 0]
+        #- ["sw2.in_gpio",  1]
+        - ["sw3", "sw", {"title": "LIGHT3 settings"}]
+        - ["sw3.id", 2]
+        - ["sw3.name", "MILE LIGHT 3"]
+        - ["sw3.out_gpio", 13]
+        - ["sw3.out_on_value", 0]
+        #- ["sw3.in_gpio",  9]
+        - ["sw4", "sw", {"title": "LIGHT4 settings"}]
+        - ["sw4.id", 3]
+        - ["sw4.name", "MILE LIGHT 4"]
+        - ["sw4.out_gpio", 15]
+        - ["sw4.out_on_value", 0]
+        #- ["sw4.in_gpio",  10]
 
   - when: mos.platform != "ubuntu"
     apply:

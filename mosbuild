@@ -1,0 +1,1 @@
+mos build --platform esp8266 --build-var MODEL=MILE4 --local --deps-dir ~/mos/mos-deps --binary-libs-dir ~/mos/mos-libs
