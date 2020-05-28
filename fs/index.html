@@ -229,6 +229,14 @@
             <span id="app_build"></span>
           </div>
           <div class="form-control">
+            <label>Disc. today:</label>
+            <span id="net_disconnects_today"></span>
+          </div>
+          <div class="form-control">
+            <label>Disc. yesterday:</label>
+            <span id="net_disconnects_yesterday"></span>
+          </div>
+          <div class="form-control">
             <label>Update (<a href="https://github.com/mongoose-os-apps/shelly-homekit">GitHub</a>):</label>
             <form id="fw_upload_form" method="POST" action="/update" enctype="multipart/form-data">
               <input type="file" id="fw_select_file" name="file" accept=".zip" />
@@ -536,6 +544,8 @@ function getInfo() {
     el("fw_container").style.visibility = "visible";
     el("device_id").style.visibility = "visible";
     el("uptime_label").style.visibility = "visible";
+    el("net_disconnects_today").innerText = res.data.net_disc_today;
+    el("net_disconnects_yesterday").innerText = res.data.net_disc_yesterday;
   }).catch(function(err) {
     alert(err);
   }).then(function() {

@@ -83,7 +83,7 @@ static void handle_auto_off(struct shelly_sw_service_ctx *ctx,
 
   ctx->auto_off_timer_id =
       mgos_set_timer(cfg->auto_off_delay * 1000, 0, do_auto_off, ctx);
-  LOG(LL_INFO, ("%d: Set auto-off timer for %d", cfg->id, cfg->auto_off_delay));
+  //LOG(LL_INFO, ("%d: Set auto-off timer for %d", cfg->id, cfg->auto_off_delay));
 }
 
 static void shelly_sw_set_state_ctx(struct shelly_sw_service_ctx *ctx,

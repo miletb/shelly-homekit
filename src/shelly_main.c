@@ -37,7 +37,7 @@
 #include "shelly_sw_service.h"
 
 #define KVS_FILE_NAME "kvs.json"
-#define NUM_SESSIONS 3
+#define NUM_SESSIONS 8
 #define IO_BUF_SIZE 2048
 
 #ifndef LED_ON
@@ -46,6 +46,10 @@
 #ifndef BTN_DOWN
 #define BTN_DOWN 0
 #endif
+
+uint16_t net_disconnections_yesterday   = 0;
+uint16_t net_disconnections_today       = 0;
+int      net_disconnections_current_day = 0;
 
 static HAPIPSession sessions[NUM_SESSIONS];
 static uint8_t in_bufs[NUM_SESSIONS][IO_BUF_SIZE];
@@ -253,9 +257,14 @@ struct mgos_ade7953 *s_ade7953 = NULL;
 #endif
 
 static void shelly_status_timer_cb(void *arg) {
-  LOG(LL_INFO, ("Uptime: %.2lf, RAM: %lu, %lu free", mgos_uptime(),
-                (unsigned long) mgos_get_heap_size(),
-                (unsigned long) mgos_get_free_heap_size()));
+  time_t rawtime;
+  time(&rawtime);
+
+  if (rawtime % 10 == 0) {
+    LOG(LL_INFO, ("Uptime: %.2lf, RAM: %lu, %lu free", mgos_uptime(),
+            (unsigned long) mgos_get_heap_size(),
+            (unsigned long) mgos_get_free_heap_size()));
+  }
 #if defined(MGOS_HAVE_ADE7953) && defined(SHELLY_PRINT_POWER_STATS)
   float f = 0, v = 0, ia = 0, ib = 0, aea = 0, aeb = 0, apa = 0, apb = 0;
   mgos_ade7953_get_frequency(s_ade7953, &f);
@@ -324,7 +333,8 @@ static void shelly_get_info_handler(struct mg_rpc_request_info *ri,
       "},"
 #endif
       "wifi_en: %B, wifi_ssid: %Q, wifi_pass: %Q, "
-      "hap_provisioned: %B, hap_paired: %B}",
+      "hap_provisioned: %B, hap_paired: %B, "
+      "net_disc_today: %d, net_disc_yesterday: %d }",
       mgos_sys_config_get_device_id(), MGOS_APP, mgos_dns_sd_get_host_name(),
       mgos_sys_ro_vars_get_fw_version(), mgos_sys_ro_vars_get_fw_id(),
       (int) mgos_uptime(),
@@ -349,7 +359,9 @@ static void shelly_get_info_handler(struct mg_rpc_request_info *ri,
 #endif
 #endif
       mgos_sys_config_get_wifi_sta_enable(), (ssid ? ssid : ""),
-      (pass ? pass : ""), hap_provisioned, hap_paired);
+      (pass ? pass : ""), hap_provisioned, hap_paired,
+      net_disconnections_today, net_disconnections_yesterday
+  );
   (void) cb_arg;
   (void) fi;
   (void) args;
@@ -373,6 +385,32 @@ static void shelly_set_switch_handler(struct mg_rpc_request_info *ri,
   (void) cb_arg;
   (void) fi;
 }
+
+static void net_cb(int ev, void *evd, void *arg) {
+  if (ev == MGOS_NET_EV_DISCONNECTED) {
+    time_t rawtime;
+    struct tm *time_info;
+    time(&rawtime);
+    time_info = localtime (&rawtime);
+
+    // sacekaj da se osvesti
+    if ((time_info->tm_year + 1900) < 2000) return;
+
+    if (time_info->tm_mday != net_disconnections_current_day) {
+      net_disconnections_yesterday = net_disconnections_today;
+      net_disconnections_today = 0;
+      net_disconnections_current_day = time_info->tm_mday;
+    }
+
+    ++net_disconnections_today;
+    LOG(LL_INFO, ("Net disconnected, today: %d, yesterday: %d",
+            net_disconnections_today, net_disconnections_yesterday));
+  }
+
+  (void) evd;
+  (void) arg;
+}
+
 
 static bool shelly_cfg_migrate(void) {
   bool changed = false;
@@ -522,6 +560,9 @@ enum mgos_app_init_result mgos_app_init(void) {
 
   mg_rpc_add_handler(mgos_rpc_get_global(), "Shelly.SetSwitch",
                      "{id: %d, state: %B}", shelly_set_switch_handler, NULL);
+
+  /* Network connectivity events */
+  mgos_event_add_group_handler(MGOS_EVENT_GRP_NET, net_cb, NULL);
 
   if (BTN_GPIO >= 0) {
     mgos_gpio_setup_input(BTN_GPIO, MGOS_GPIO_PULL_UP);
