@@ -4,3 +4,5 @@ build_*/
 deps/
 .DS_Store
 .idea/
+/cmake-build-debug/
+/logs/

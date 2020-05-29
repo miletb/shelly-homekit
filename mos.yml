@@ -28,7 +28,7 @@ config_schema:
   - ["sw.state", "b", false, {"State of the switch"}]
   - ["sw.initial_state", "i", 0, {"Initial state on power-on: 0 - off, 1 - on, 2 - restore last state, 3 - matches input if in toggle mode, otherwise off"}]
   - ["sw.auto_off", "b", false, {"Whether the switch should automatically turn OFF after turning ON"}]
-  - ["sw.auto_off_delay", "d", -1, {"Delay for automatically turning OFF, in seconds"}]
+  - ["sw.auto_off_delay", "d", 2, {"Delay for automatically turning OFF, in seconds"}]
 
   - ["shelly.cfg_version", "i", 0, {"Configuration version"}]
   # Deprecated settings, only kept to enable migration.
@@ -301,7 +301,7 @@ conds:
         - origin: https://github.com/mongoose-os-libs/mbedtls
         - origin: https://github.com/mongoose-os-libs/mongoose
       cdefs:
-        LED_GPIO: 2
+        LED_GPIO: 5
         LED_ON: 0
         BTN_GPIO: 0
         BTN_DOWN: 0
@@ -318,7 +318,6 @@ conds:
         - ["wifi.sta.ssid", "Net-Net Bre"]
         - ["wifi.sta.pass", "valentinakitic"]
         - ["wifi.sta_ps_mode", 0]
-        #- ["wifi.sta.listen_interval_ms", 300]
         - ["wifi.ap.enable", false]
         # DEBUG log
         - ["debug.udp_log_addr", "192.168.1.60:2203"]
@@ -328,31 +327,27 @@ conds:
         - ["sw1", "sw", {"title": "LIGHT1 settings"}]
         - ["sw1.id", 0]
         - ["sw1.name", "MILE LIGHT 1"]
-#        - ["sw1.out_gpio", 4]
-        - ["sw1.out_gpio", 32]
+        - ["sw1.out_gpio", 22]
         - ["sw1.out_on_value", 0]
-        #- ["sw1.in_gpio",  3]
+        - ["sw1.in_gpio",  18]
         - ["sw2", "sw", {"title": "LIGHT2 settings"}]
         - ["sw2.id", 1]
         - ["sw2.name", "MILE LIGHT 2"]
-#        - ["sw2.out_gpio", 5]
-        - ["sw2.out_gpio", 33]
+        - ["sw2.out_gpio", 21]
         - ["sw2.out_on_value", 0]
-        #- ["sw2.in_gpio",  1]
+        - ["sw2.in_gpio",  17]
         - ["sw3", "sw", {"title": "LIGHT3 settings"}]
         - ["sw3.id", 2]
         - ["sw3.name", "MILE LIGHT 3"]
-#        - ["sw3.out_gpio", 12]
-        - ["sw3.out_gpio", 25]
+        - ["sw3.out_gpio", 19]
         - ["sw3.out_on_value", 0]
-        #- ["sw3.in_gpio",  9]
+        - ["sw3.in_gpio",  16]
         - ["sw4", "sw", {"title": "LIGHT4 settings"}]
         - ["sw4.id", 3]
         - ["sw4.name", "MILE LIGHT 4"]
-        - ["sw4.out_gpio", 26]
-#        - ["sw4.out_gpio", 14]
+        - ["sw4.out_gpio", 23]
         - ["sw4.out_on_value", 0]
-        #- ["sw4.in_gpio",  10]
+        - ["sw4.in_gpio",  4]
 
   - when: mos.platform != "ubuntu"
     apply:

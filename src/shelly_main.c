@@ -313,6 +313,14 @@ static void shelly_get_info_handler(struct mg_rpc_request_info *ri,
   struct shelly_sw_info sw2;
   shelly_sw_get_info(mgos_sys_config_get_sw2_id(), &sw2);
 #endif
+#ifdef MGOS_CONFIG_HAVE_SW3
+  struct shelly_sw_info sw3;
+  shelly_sw_get_info(mgos_sys_config_get_sw3_id(), &sw3);
+#endif
+#ifdef MGOS_CONFIG_HAVE_SW4
+  struct shelly_sw_info sw4;
+  shelly_sw_get_info(mgos_sys_config_get_sw4_id(), &sw4);
+#endif
   mg_rpc_send_responsef(
       ri,
       "{id: %Q, app: %Q, host: %Q, version: %Q, fw_build: %Q, uptime: %d, "
@@ -330,6 +338,16 @@ static void shelly_get_info_handler(struct mg_rpc_request_info *ri,
 #ifdef SHELLY_HAVE_PM
       ", apower: %.3f, aenergy: %.3f"
 #endif
+      "},"
+#endif
+#ifdef MGOS_CONFIG_HAVE_SW3
+      "sw3: {id: %d, name: %Q, in_mode: %d, initial: %d, "
+      "state: %B, auto_off: %B, auto_off_delay: %.3f"
+      "},"
+#endif
+#ifdef MGOS_CONFIG_HAVE_SW4
+      "sw4: {id: %d, name: %Q, in_mode: %d, initial: %d, "
+      "state: %B, auto_off: %B, auto_off_delay: %.3f"
       "},"
 #endif
       "wifi_en: %B, wifi_ssid: %Q, wifi_pass: %Q, "
@@ -357,6 +375,20 @@ static void shelly_get_info_handler(struct mg_rpc_request_info *ri,
 #ifdef SHELLY_HAVE_PM
       sw2.apower, sw2.aenergy,
 #endif
+#endif
+#ifdef MGOS_CONFIG_HAVE_SW3
+      mgos_sys_config_get_sw3_id(), mgos_sys_config_get_sw3_name(),
+      mgos_sys_config_get_sw3_in_mode(),
+      mgos_sys_config_get_sw3_initial_state(), sw3.state,
+      mgos_sys_config_get_sw3_auto_off(),
+      mgos_sys_config_get_sw3_auto_off_delay(),
+#endif
+#ifdef MGOS_CONFIG_HAVE_SW4
+      mgos_sys_config_get_sw4_id(), mgos_sys_config_get_sw4_name(),
+      mgos_sys_config_get_sw4_in_mode(),
+      mgos_sys_config_get_sw4_initial_state(), sw4.state,
+      mgos_sys_config_get_sw4_auto_off(),
+      mgos_sys_config_get_sw4_auto_off_delay(),
 #endif
       mgos_sys_config_get_wifi_sta_enable(), (ssid ? ssid : ""),
       (pass ? pass : ""), hap_provisioned, hap_paired,
