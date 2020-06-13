@@ -270,7 +270,8 @@ static void shelly_sw_in_cb(int pin, void *arg) {
       }
       break;
     case SHELLY_SW_IN_MODE_TOGGLE:
-      shelly_sw_set_state_ctx(ctx, in_state, "switch");
+      // pull-up resitor config
+      shelly_sw_set_state_ctx(ctx, !in_state, "switch");
       break;
     case SHELLY_SW_IN_MODE_EDGE:
       shelly_sw_set_state_ctx(ctx, !ctx->info.state, "button");

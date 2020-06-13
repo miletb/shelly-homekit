@@ -261,9 +261,11 @@ static void shelly_status_timer_cb(void *arg) {
   time(&rawtime);
 
   if (rawtime % 10 == 0) {
-    LOG(LL_INFO, ("Uptime: %.2lf, RAM: %lu, %lu free", mgos_uptime(),
+    LOG(LL_INFO, ("Uptime: %.2lf, RAM: %lu, %lu free, wifi: %d", mgos_uptime(),
             (unsigned long) mgos_get_heap_size(),
-            (unsigned long) mgos_get_free_heap_size()));
+            (unsigned long) mgos_get_free_heap_size(),
+            mgos_wifi_get_status()
+    ));
   }
 #if defined(MGOS_HAVE_ADE7953) && defined(SHELLY_PRINT_POWER_STATS)
   float f = 0, v = 0, ia = 0, ib = 0, aea = 0, aeb = 0, apa = 0, apb = 0;

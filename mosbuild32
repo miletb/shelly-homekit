@@ -1,1 +1,0 @@
-mos build --platform esp32 --build-var MODEL=MILE4-32 --local --deps-dir ~/mos/mos-deps --binary-libs-dir ~/mos/mos-libs
